@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Tumar Dukan - E-commerce Application
 
 ## Project Overview
@@ -172,3 +173,6 @@ The frontend is a React application built with Vite.
 *   `npm run shell`: Opens a Firebase functions shell (if configured).
 *   `npm run deploy`: Deploys Firebase functions (if configured).
 *   `npm run logs`: Views Firebase functions logs (if configured).
+=======
+# Tumar_Dokan
+>>>>>>> a72f875e35b0d62b7992c439c4423dd00fee48f6

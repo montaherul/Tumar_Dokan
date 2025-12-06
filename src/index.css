@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* Default theme (now light) */
+@theme inline {
+  --color-background: #f8fafc; /* Light blue-gray for background */
+  --color-foreground: #1e293b; /* Dark blue-gray for text */
+
+  --color-card: #ffffff; /* White for cards */
+  --color-card-foreground: #1e293b;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1e293b;
+
+  --color-primary: #0ea5e9; /* Vibrant Sky Blue accent */
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #e2e8f0; /* Light gray for secondary elements */
+  --color-secondary-foreground: #1e293b;
+
+  --color-muted: #cbd5e1; /* Even more muted light gray */
+  --color-muted-foreground: #64748b; /* Muted text */
+
+  --color-accent: #0ea5e9; /* Using primary as accent for vibrancy */
+  --color-accent-foreground: #ffffff;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+
+  --color-border: #e2e8f0; /* Light border */
+  --color-input: #ffffff; /* White input background */
+  --color-ring: #0ea5e9; /* Accent color for focus rings */
+
+  --radius: 0.5rem; /* Slightly smaller radius for a clean feel */
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-feature-settings: "rlig" 1, "calt" 1;
+  /* Smooth transitions for theme changes */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom scrollbar for light theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* NEW: Custom Keyframe for Slide Up and Fade In */
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* NEW: Custom Utility Classes for Animation */
+.animate-slide-up-fade-in {
+  animation: slideUpFadeIn 0.7s ease-out forwards;
+}
+.animate-slide-up-fade-in-delay-200 {
+  animation: slideUpFadeIn 0.7s ease-out 0.2s forwards;
+}
+.animate-slide-up-fade-in-delay-400 {
+  animation: slideUpFadeIn 0.7s ease-out 0.4s forwards;
+}
