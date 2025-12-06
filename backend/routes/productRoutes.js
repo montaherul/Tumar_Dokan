@@ -3,12 +3,44 @@ const router = express.Router();
 const Product = require('../models/Product');
 const auth = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
+const fs = require('fs'); // Import file system module
+const path = require('path'); // Import path module
+
+// Load static products from products.json once when the module is loaded
+let staticProducts = [];
+try {
+  const productsJsonPath = path.join(__dirname, '../products.json');
+  const rawData = fs.readFileSync(productsJsonPath);
+  const { products } = JSON.parse(rawData);
+  staticProducts = products.map(p => ({
+    _id: p.id.toString(), // Map id to _id as string for consistency with MongoDB
+    title: p.title,
+    slug: p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-*|-*$/g, ''),
+    price: p.price,
+    discountPercentage: p.discountPercentage || 0,
+    description: p.description,
+    category: p.category,
+    image: p.thumbnail || p.images[0], // Use thumbnail or first image
+    stock: p.stock,
+    rating: {
+      rate: p.rating,
+      count: p.reviews ? p.reviews.length : 0,
+    },
+    createdAt: new Date(p.meta.createdAt),
+    updatedAt: new Date(p.meta.updatedAt),
+  }));
+  console.log('Loaded static products from products.json for fallback.');
+} catch (err) {
+  console.error('Error loading static products from products.json:', err.message);
+}
+
 
 // @route   GET /api/products
 // @desc    Get all products, with optional category and search filters
 // @access  Public
 router.get('/', async (req, res) => {
   try {
+    // Attempt to fetch from MongoDB first
     const { category, search } = req.query; // Get category and search from query parameters
     let query = {};
 
@@ -25,10 +57,27 @@ router.get('/', async (req, res) => {
     }
 
     const products = await Product.find(query);
-    console.log(`Fetched ${products.length} products from DB with filters.`); // Added console log
     res.json(products);
   } catch (err) {
-    console.error(err.message);
+    console.error('MongoDB query failed for /api/products, attempting fallback to static products:', err.message);
+    // Check if it's a database connection error (MongooseServerSelectionError or MongoNetworkError)
+    if (err.name === 'MongooseServerSelectionError' || err.name === 'MongoNetworkError') {
+      // Apply filters to static products
+      let filteredStaticProducts = staticProducts;
+      const { category, search } = req.query;
+      if (category && category !== 'All') {
+        filteredStaticProducts = filteredStaticProducts.filter(p => p.category === category);
+      }
+      if (search) {
+        const lowerSearch = search.toLowerCase();
+        filteredStaticProducts = filteredStaticProducts.filter(p =>
+          p.title.toLowerCase().includes(lowerSearch) ||
+          p.description.toLowerCase().includes(lowerSearch)
+        );
+      }
+      return res.json(filteredStaticProducts);
+    }
+    // If not a database connection error, re-throw or send 500
     res.status(500).send('Server Error');
   }
 });
@@ -44,7 +93,16 @@ router.get('/:id', async (req, res) => {
     }
     res.json(product);
   } catch (err) {
-    console.error(err.message);
+    console.error('MongoDB query for single product failed, attempting fallback to static products:', err.message);
+    // Check if it's a database connection error
+    if (err.name === 'MongooseServerSelectionError' || err.name === 'MongoNetworkError') {
+      const product = staticProducts.find(p => p._id === req.params.id);
+      if (product) {
+        return res.json(product);
+      } else {
+        return res.status(404).json({ message: 'Product not found in static data' });
+      }
+    }
     if (err.kind === 'ObjectId') { // Handle invalid ObjectId format
       return res.status(400).json({ message: 'Invalid Product ID' });
     }
