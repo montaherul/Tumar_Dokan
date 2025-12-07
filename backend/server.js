@@ -29,7 +29,8 @@ mongoose.connect(MONGO_URI)
 
 // --- Middleware ---
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow your React frontend to access
+  origin: 'https://tumar-dokan.onrender.com/',
+  // Allow your React frontend to access
   credentials: true,
 }));
 app.use(express.json()); // For parsing application/json
