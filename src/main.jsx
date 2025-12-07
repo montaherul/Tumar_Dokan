@@ -51,7 +51,7 @@ const router = createBrowserRouter([
       if (search) query.append('search', search);
       if (category && category !== 'All') query.append('category', category);
 
-      const response = await fetch(`http://localhost:5000/api/products?${query.toString()}`);
+      const response = await fetch(`https://tumar-dokan-v0.onrender.com/products?${query.toString()}`);
       if (!response.ok) {
         throw new Error('Failed to fetch products from loader.');
       }
@@ -61,13 +61,13 @@ const router = createBrowserRouter([
   },
   {
     path: "/productfromapi",
-    loader: () => fetch("https://fakestoreapi.com/products/"), // Keep this for now if it's a separate feature
+    loader: () => fetch("https://tumar-dokan-v0.onrender.com/products"), // Keep this for now if it's a separate feature
     Component: Productfromapi,
   },
   {
     path: "/products/:id",
     loader: ({ params }) => {
-      return fetch(`http://localhost:5000/api/products/${params.id}`); // Use new backend API
+      return fetch(`https://tumar-dokan-v0.onrender.com/products/${params.id}`); // Use new backend API
     },
     Component: Details,
   },
@@ -75,7 +75,7 @@ const router = createBrowserRouter([
   {
     path: "/products/order/:id",
     loader: ({ params }) => {
-      return fetch(`http://localhost:5000/api/products/${params.id}`); // Use new backend API
+      return fetch(`https://tumar-dokan-v0.onrender.com/products/${params.id}`); // Use new backend API
     },
     element: <ProtectedRoute><Order /></ProtectedRoute>, // Protect the Order route
   },
